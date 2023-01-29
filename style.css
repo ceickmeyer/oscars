@@ -1,0 +1,9 @@
+body {
+  background-image: url("bg.jpg");
+  background-repeat: repeat;
+}
+
+h1,
+h2 {
+  text-align: center;
+}
