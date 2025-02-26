@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import re
+import json
 from collections import defaultdict, OrderedDict
 
 def preprocess_columns(df):
@@ -154,6 +155,9 @@ columns_info, category_order = preprocess_columns(df)
 output_dir = "user_votes"
 os.makedirs(output_dir, exist_ok=True)
 
+# List to store details about generated files for the index and JSON
+generated_files = []
+
 for index, row in df.iterrows():
     email = row["Email Address"].strip()
     if not email:
@@ -172,10 +176,56 @@ for index, row in df.iterrows():
     # Generate HTML content, passing the preserved category order
     html_content = generate_html_content(email, user_votes, category_order)
     
-    # Save to file
+    # Save to file using a safe filename format
     safe_email = email.replace('@', '_at_').replace('.', '_dot_')
-    file_name = os.path.join(output_dir, f"{safe_email}.html")
-    with open(file_name, 'w', encoding='utf-8') as f:
+    file_name = f"{safe_email}.html"
+    file_path_full = os.path.join(output_dir, file_name)
+    with open(file_path_full, 'w', encoding='utf-8') as f:
         f.write(html_content)
+    
+    # Record this file's details for later use
+    generated_files.append({"email": email, "file": file_name})
 
 print("HTML files generated successfully.")
+
+# Create an index HTML file linking to all generated HTML files.
+index_html = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index of Oscar Votes</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #b8860b; }
+        ul { list-style: none; padding: 0; }
+        li { margin-bottom: 10px; }
+        a { text-decoration: none; color: #333; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Index of Oscar Votes</h1>
+    <ul>
+"""
+
+for entry in generated_files:
+    # The links are relative to the output directory
+    index_html += f'        <li><a href="{entry["file"]}">{entry["email"]}</a></li>\n'
+
+index_html += """
+    </ul>
+</body>
+</html>
+"""
+
+with open(os.path.join(output_dir, "index.html"), "w", encoding='utf-8') as f:
+    f.write(index_html)
+
+print("Index HTML file created successfully.")
+
+# Create a JSON file that maps each email to its HTML file.
+with open(os.path.join(output_dir, "votes.json"), "w", encoding='utf-8') as f:
+    json.dump(generated_files, f, indent=4)
+
+print("JSON file created successfully.")
