@@ -2,47 +2,49 @@ import pandas as pd
 import os
 import re
 import json
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 def preprocess_columns(df):
-    """Extract category and nominee from each column header and preserve category order."""
+    """Extract category, points possible, and nominee from each column header and preserve category order."""
     columns_info = []
     category_order = []  # To preserve the order of categories as they appear in the CSV
+    category_points_possible = {}
     seen_categories = set()  # To avoid duplicates
+
+    # Updated regex to capture category, points possible, and nominee
+    header_regex = r'^(.*?)\s*\((\d+)\s*points\s*possible\)\s*\["?(.*?)"?\]$'
 
     for col in df.columns:
         if col in ["Timestamp", "Email Address"]:
             continue
-        # Regex to capture category and nominee
-        match = re.match(
-            r'^(.*?)\s*\(\d+\s*points\s*possible\)\s*\["?(.*?)"?\]$',
-            col
-        )
+
+        match = re.match(header_regex, col)
         if match:
             category = match.group(1).strip()
-            nominee = match.group(2).strip()
-            # Remove quotes around nominee if present
-            nominee = re.sub(r'^"|"$', '', nominee)
+            points_possible = int(match.group(2).strip())
+            nominee = match.group(3).strip()
         else:
             # Fallback for unexpected formats
             category = col.split('[')[0].split('(')[0].strip()
             nominee = col
+            points_possible = 0
 
-        columns_info.append((category, nominee))
+        columns_info.append((category, points_possible, nominee))
 
-        # Track category order
+        # Track category order and store points possible (first encountered wins)
         if category not in seen_categories:
             seen_categories.add(category)
             category_order.append(category)
+            category_points_possible[category] = points_possible
 
-    return columns_info, category_order
+    return columns_info, category_order, category_points_possible
 
 def parse_points(value):
     """Parse and sum points from a cell value."""
     points = re.findall(r'(\d+)\s*points?', str(value))
     return sum(int(p) for p in points) if points else 0
 
-def generate_html_content(email, user_votes, category_order):
+def generate_html_content(email, user_votes, category_order, category_points_possible):
     """Generate HTML content with grouped categories and combined points, preserving category order."""
     html_template = """
 <!DOCTYPE html>
@@ -53,7 +55,7 @@ def generate_html_content(email, user_votes, category_order):
     <title>Oscar Votes for {email}</title>
     <style>
         body {{
-            font-family: "Times New Roman", serif;
+            font-family: Arial, sans-serif;
             background-color: #fff;
             padding: 20px;
             max-width: 1200px;
@@ -84,7 +86,6 @@ def generate_html_content(email, user_votes, category_order):
             font-size: 1.2em;
             font-weight: bold;
             margin-bottom: 15px;
-            text-transform: uppercase;
             border-bottom: 1px solid #d4c485;
             padding-bottom: 5px;
         }}
@@ -122,7 +123,11 @@ def generate_html_content(email, user_votes, category_order):
         if not nominees:
             continue
         
-        category_block = [f'<div class="category"><div class="category-title">{category}</div>']
+        # Build the category header with points possible (if available)
+        points_possible = category_points_possible.get(category, 0)
+        category_header = f"{category} - {points_possible} Points" if points_possible else category
+        
+        category_block = [f'<div class="category"><div class="category-title">{category_header}</div>']
         
         # Sort nominees by points descending, then by name ascending
         sorted_nominees = sorted(nominees.items(), key=lambda x: (-x[1], x[0]))
@@ -149,8 +154,8 @@ def generate_html_content(email, user_votes, category_order):
 file_path = "oscar_votes.csv"
 df = pd.read_csv(file_path)
 
-# Preprocess column headers to get category and nominee, and preserve category order
-columns_info, category_order = preprocess_columns(df)
+# Preprocess column headers to get category, points possible, and nominee, and preserve category order
+columns_info, category_order, category_points_possible = preprocess_columns(df)
 
 output_dir = "user_votes"
 os.makedirs(output_dir, exist_ok=True)
@@ -165,16 +170,16 @@ for index, row in df.iterrows():
     
     user_votes = defaultdict(lambda: defaultdict(int))
     
-    # Iterate through each data column (skipping Timestamp and Email)
+    # Iterate through each data column (skipping Timestamp and Email Address)
     for i in range(2, len(row)):
-        category, nominee = columns_info[i-2]  # Adjust index since columns_info skips first two
+        category, _, nominee = columns_info[i-2]  # Adjust index since columns_info skips first two
         cell_value = row[i]
         points = parse_points(cell_value)
         if points > 0:
             user_votes[category][nominee] += points
     
-    # Generate HTML content, passing the preserved category order
-    html_content = generate_html_content(email, user_votes, category_order)
+    # Generate HTML content, passing the preserved category order and points mapping
+    html_content = generate_html_content(email, user_votes, category_order, category_points_possible)
     
     # Save to file using a safe filename format
     safe_email = email.replace('@', '_at_').replace('.', '_dot_')
