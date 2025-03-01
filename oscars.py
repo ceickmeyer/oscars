@@ -109,6 +109,7 @@ def generate_html_content(email, user_votes, category_order, category_points_pos
 </head>
 <body>
     <div class="header">Oscar Votes for {email}</div>
+    <div class="header"><a href="../index.html">Who Voted for What</a></div>
     <div class="ballot-grid">
         {categories_html}
     </div>
