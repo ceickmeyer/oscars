@@ -320,6 +320,7 @@ def main():
       🎬 Submit your ballot
     </a>
     <a class="scores-link" href="scores.html">🏆 Scoreboard</a>
+    <a class="scores-link" href="viz.html">📊 Visualizations</a>
     <span class="update-note">Ballots will be updated before the ceremony</span>
   </div>
 </header>
