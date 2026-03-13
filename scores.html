@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oscars Pool 2026 — Scores</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --base:    #1e1e2e;
+    --mantle:  #181825;
+    --crust:   #11111b;
+    --surface0:#313244;
+    --surface1:#45475a;
+    --surface2:#585b70;
+    --overlay0:#6c7086;
+    --text:    #cdd6f4;
+    --subtext0:#a6adc8;
+    --subtext1:#bac2de;
+    --gold:    #f9e2af;
+    --green:   #a6e3a1;
+    --blue:    #89dceb;
+    --accent:  #cba6f7;
+    --peach:   #fab387;
+    --red:     #f38ba8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--base);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--crust);
+    padding: 20px;
+    border-bottom: 1px solid var(--surface0);
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--gold);
+  }
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .scoreboard-wrap {
+    padding: 20px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+  }
+
+  thead th {
+    background: var(--crust);
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--subtext0);
+    text-align: center;
+    border-bottom: 2px solid var(--surface0);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  thead th.cat-header {
+    font-size: 0.65rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--overlay0);
+  }
+  /* Rotate category headers so they don't blow out the width */
+  thead th.cat-header span {
+    display: inline-block;
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    max-height: 120px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    line-height: 1.2;
+  }
+  thead th:first-child,
+  thead th:nth-child(2),
+  thead th:nth-child(3) {
+    text-align: left;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--surface0);
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: rgba(203,166,247,0.04); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td {
+    padding: 11px 12px;
+    font-size: 0.85rem;
+    text-align: center;
+    vertical-align: middle;
+  }
+  td:first-child, td:nth-child(2) { text-align: left; }
+
+  .rank-cell {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--subtext1);
+    white-space: nowrap;
+    min-width: 48px;
+  }
+  .name-cell {
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .total-cell {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--gold);
+    min-width: 56px;
+  }
+  .cat-scored {
+    color: var(--green);
+    font-weight: 500;
+    font-size: 0.8rem;
+  }
+  .cat-zero {
+    color: var(--surface2);
+    font-size: 0.78rem;
+  }
+
+  /* Top 3 row accents */
+  tr.rank-1 { background: rgba(249,226,175,0.05); }
+  tr.rank-1 .rank-cell { color: var(--gold); }
+  tr.rank-2 { background: rgba(166,227,161,0.04); }
+  tr.rank-2 .rank-cell { color: var(--green); }
+  tr.rank-3 { background: rgba(137,220,235,0.03); }
+  tr.rank-3 .rank-cell { color: var(--blue); }
+
+  .note {
+    text-align: center;
+    padding: 14px 20px;
+    color: var(--overlay0);
+    font-size: 0.78rem;
+    font-style: italic;
+    border-top: 1px solid var(--surface0);
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🏆 Scoreboard</h1>
+  <a class="back-link" href="index.html">← Back to ballots</a>
+</header>
+<div class="scoreboard-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Total</th>
+        <th class="cat-header"><span>Best Picture</span></th><th class="cat-header"><span>Best Director</span></th><th class="cat-header"><span>Best Actress</span></th><th class="cat-header"><span>Best Actor</span></th><th class="cat-header"><span>Best Supporting Actress</span></th><th class="cat-header"><span>Best Supporting Actor</span></th><th class="cat-header"><span>Best Original Screenplay</span></th><th class="cat-header"><span>Best Adapted Screenplay</span></th><th class="cat-header"><span>Best Animated Feature</span></th><th class="cat-header"><span>Best International Film</span></th><th class="cat-header"><span>Best Film Editing</span></th><th class="cat-header"><span>Best Cinematography</span></th><th class="cat-header"><span>Best Casting</span></th><th class="cat-header"><span>Best Costume Design</span></th><th class="cat-header"><span>Best Visual Effects</span></th><th class="cat-header"><span>Best Sound</span></th><th class="cat-header"><span>Best Production Design</span></th><th class="cat-header"><span>Best Original Song</span></th><th class="cat-header"><span>Best Original Score</span></th><th class="cat-header"><span>Best Makeup & Hairstyling</span></th><th class="cat-header"><span>Best Documentary Feature</span></th><th class="cat-header"><span>Best Documentary Short</span></th><th class="cat-header"><span>Best Live-Action Short</span></th><th class="cat-header"><span>Best Animated Short</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      
+        <tr class="rank-1">
+            <td class="rank-cell">🥇 1</td>
+            <td class="name-cell">Brendan F.</td>
+            <td class="total-cell">0</td>
+            <td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td>
+        </tr>
+        <tr class="rank-1">
+            <td class="rank-cell">🥇 1</td>
+            <td class="name-cell">Cody</td>
+            <td class="total-cell">0</td>
+            <td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td>
+        </tr>
+        <tr class="rank-1">
+            <td class="rank-cell">🥇 1</td>
+            <td class="name-cell">Goobler</td>
+            <td class="total-cell">0</td>
+            <td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td>
+        </tr>
+        <tr class="rank-1">
+            <td class="rank-cell">🥇 1</td>
+            <td class="name-cell">Kate</td>
+            <td class="total-cell">0</td>
+            <td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td>
+        </tr>
+        <tr class="rank-1">
+            <td class="rank-cell">🥇 1</td>
+            <td class="name-cell">Sam Y.</td>
+            <td class="total-cell">0</td>
+            <td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td>
+        </tr>
+        <tr class="rank-1">
+            <td class="rank-cell">🥇 1</td>
+            <td class="name-cell">Jake J.</td>
+            <td class="total-cell">0</td>
+            <td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td><td class="cat-zero">—</td>
+        </tr>
+    </tbody>
+  </table>
+</div>
+<p class="note">Scores updated throughout the ceremony — refresh for latest standings</p>
+</body>
+</html>
