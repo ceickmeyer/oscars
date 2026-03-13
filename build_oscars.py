@@ -302,7 +302,7 @@ def main():
   <h1>Oscars Pool 2026</h1>
   <p>Follow along &amp; track your picks</p>
   <div class="header-note">
-    <a class="form-link" href="https://docs.google.com/forms/d/e/1FAIpQLSe6NOKF0DZ3TavGQGu94ylT_oVfKajue2UBLAePusyRiQZz9A/viewform?usp=sharing&ouid=106984010554763273750" target="_blank" rel="noopener">
+    <a class="form-link" href="https://docs.google.com/forms/d/e/1FAIpQLScOZqyB_FIuUnetQZt8S18rlAFoWXOlg4kZlmumui9VffuLDA/viewform?usp=dialog" target="_blank" rel="noopener">
       🎬 Submit your ballot
     </a>
     <span class="update-note">Ballots will be updated before the ceremony</span>
