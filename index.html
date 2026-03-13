@@ -49,6 +49,31 @@
     text-transform: uppercase;
     margin-top: 4px;
   }
+  .header-note {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-top: 12px;
+  }
+  .form-link {
+    display: inline-block;
+    background: var(--accent);
+    color: var(--crust);
+    text-decoration: none;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 7px 14px;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .form-link:hover { opacity: 0.85; }
+  .update-note {
+    color: var(--overlay0);
+    font-size: 0.78rem;
+    font-style: italic;
+  }
 
   .legend {
     display: flex;
@@ -166,6 +191,12 @@
 <header>
   <h1>Oscars Pool 2026</h1>
   <p>Follow along &amp; track your picks</p>
+  <div class="header-note">
+    <a class="form-link" href="https://docs.google.com/forms/d/e/1FAIpQLSe6NOKF0DZ3TavGQGu94ylT_oVfKajue2UBLAePusyRiQZz9A/viewform?usp=sharing&ouid=106984010554763273750" target="_blank" rel="noopener">
+      🎬 Submit your ballot
+    </a>
+    <span class="update-note">Ballots will be updated before the ceremony</span>
+  </div>
 </header>
 <div class="legend">
   <span><span class="star gold">★</span> 1st pick — double points</span>
