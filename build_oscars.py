@@ -48,6 +48,8 @@ def main():
 
     players = []
     for row in rows:
+        if not row[2].strip():
+            continue
         name = obfuscate_name(row[2].strip())
         picks_by_cat = {}
         for cat in cat_order:
@@ -64,11 +66,16 @@ def main():
             picks_by_cat[cat] = nominee_picks
         players.append({'name': name, 'picks': picks_by_cat})
 
-    tabs_html = ''
     panels_html = ''
+    picker_btns = ''
+
     for pi, player in enumerate(players):
-        active = 'active' if pi == 0 else ''
-        tabs_html += f'<button class="tab-btn {active}" onclick="showTab({pi})">{player["name"]}</button>\n'
+        parts = player['name'].split()
+        initials = ''.join(p[0].upper() for p in parts[:2])
+        picker_btns += f'<button class="picker-btn" onclick="openBallot({pi})">'
+        picker_btns += f'<span class="avatar">{initials}</span>'
+        picker_btns += f'<span class="picker-name">{player["name"]}</span>'
+        picker_btns += f'</button>\n'
 
         panel_content = ''
         for cat in cat_order:
@@ -103,7 +110,11 @@ def main():
             </div>'''
 
         panels_html += f'''
-        <div class="tab-panel {active}" id="panel-{pi}">
+        <div class="ballot-panel" id="panel-{pi}" hidden>
+            <div class="ballot-header">
+                <button class="back-btn" onclick="closeBallot()">← All ballots</button>
+                <span class="ballot-name">{player["name"]}</span>
+            </div>
             <div class="grid">{panel_content}
             </div>
         </div>'''
@@ -211,51 +222,110 @@ def main():
   }}
   .legend span {{ display: flex; align-items: center; gap: 6px; }}
 
-  .tabs {{
+  /* ── Picker ── */
+  #picker {{
+    padding: 28px 20px;
+  }}
+  .picker-label {{
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--overlay0);
+    margin-bottom: 16px;
+  }}
+  .picker-grid {{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }}
+  .picker-btn {{
+    background: var(--mantle);
+    border: 1px solid var(--surface0);
+    border-radius: 10px;
+    padding: 18px 12px 14px;
+    cursor: pointer;
     display: flex;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    gap: 4px;
-    padding: 12px 20px 0;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.15s, background 0.15s, transform 0.12s;
+    -webkit-tap-highlight-color: transparent;
+  }}
+  .picker-btn:hover {{
+    border-color: var(--accent);
+    background: rgba(203,166,247,0.07);
+    transform: translateY(-2px);
+  }}
+  .picker-btn:active {{ transform: scale(0.97); }}
+  .avatar {{
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--surface0);
+    border: 2px solid var(--surface1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }}
+  .picker-name {{
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.3;
+    word-break: break-word;
+  }}
+
+  /* ── Ballot panel ── */
+  .ballot-panel[hidden] {{ display: none; }}
+
+  .ballot-header {{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 20px;
     background: var(--mantle);
     border-bottom: 1px solid var(--surface0);
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }}
-  .tabs::-webkit-scrollbar {{ display: none; }}
-  .tab-btn {{
-    flex-shrink: 0;
+  .back-btn {{
     background: transparent;
     border: 1px solid var(--surface1);
     color: var(--subtext0);
-    padding: 10px 18px;
-    border-radius: 6px 6px 0 0;
+    padding: 7px 14px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.88rem;
+    font-size: 0.82rem;
     font-family: 'DM Sans', sans-serif;
     font-weight: 500;
-    transition: color 0.15s, border-color 0.15s, background 0.15s;
-    border-bottom: none;
-    margin-bottom: -1px;
+    transition: color 0.15s, border-color 0.15s;
     white-space: nowrap;
     -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
   }}
-  .tab-btn:hover {{ color: var(--text); border-color: var(--surface2); }}
-  .tab-btn.active {{
-    background: var(--base);
-    border-color: var(--accent);
-    color: var(--accent);
-    border-bottom: 1px solid var(--base);
+  .back-btn:hover {{ color: var(--text); border-color: var(--accent); }}
+  .ballot-name {{
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--gold);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }}
 
-  .tab-panel {{ display: none; padding: 20px; }}
-  .tab-panel.active {{ display: block; }}
-
+  /* ── Category grid ── */
   .grid {{
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 14px;
+    padding: 20px;
   }}
-
   .category {{
     background: var(--mantle);
     border-radius: 8px;
@@ -283,7 +353,6 @@ def main():
     letter-spacing: 0;
     text-transform: none;
   }}
-
   table {{ width: 100%; border-collapse: collapse; }}
   tr {{ border-bottom: 1px solid var(--surface0); }}
   tr:last-child {{ border-bottom: none; }}
@@ -307,7 +376,9 @@ def main():
   .star.blue   {{ color: var(--blue);   filter: drop-shadow(0 0 4px rgba(137,220,235,0.4)); }}
 
   @media (max-width: 500px) {{
-    .grid {{ grid-template-columns: 1fr; }}
+    .grid {{ grid-template-columns: 1fr; padding: 14px; }}
+    .picker-grid {{ grid-template-columns: repeat(3, 1fr); gap: 10px; }}
+    #picker {{ padding: 20px 16px; }}
   }}
 </style>
 </head>
@@ -320,7 +391,7 @@ def main():
       🎬 Submit your ballot
     </a>
     <a class="scores-link" href="scores.html">🏆 Scoreboard</a>
-    <a class="scores-link" href="viz.html">📊 Visualizations</a>
+    <a class="scores-link" href="viz.html">📊 Consensus</a>
     <span class="update-note">Ballots will be updated before the ceremony</span>
   </div>
 </header>
@@ -329,13 +400,25 @@ def main():
   <span><span class="star silver">◆</span> 2nd pick</span>
   <span><span class="star blue">♥</span> For fun — no points</span>
 </div>
-<div class="tabs">
-{tabs_html}</div>
+
+<div id="picker">
+  <p class="picker-label">Whose ballot do you want to see?</p>
+  <div class="picker-grid">
+{picker_btns}  </div>
+</div>
+
 {panels_html}
+
 <script>
-function showTab(idx) {{
-  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', i===idx));
-  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', i===idx));
+function openBallot(idx) {{
+  document.getElementById('picker').hidden = true;
+  document.getElementById('panel-' + idx).hidden = false;
+  window.scrollTo(0, 0);
+}}
+function closeBallot() {{
+  document.querySelectorAll('.ballot-panel').forEach(p => p.hidden = true);
+  document.getElementById('picker').hidden = false;
+  window.scrollTo(0, 0);
 }}
 </script>
 </body>
